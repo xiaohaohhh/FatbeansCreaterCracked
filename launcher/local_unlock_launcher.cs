@@ -17,6 +17,7 @@ internal static class LocalUnlockLauncher
     {
         new Target("account.CN3OHofjPa", "hy3KihF9xvt2y8HqZYt.XlSQv8Fs6mqx3mINYkI", "EyIOL3b7uw", new byte[] { 0x31, 0xc0, 0xc6, 0x41, 0x78, 0x00, 0xc3 }),
         new Target("account.RgiTYlXbQF", "hy3KihF9xvt2y8HqZYt.XlSQv8Fs6mqx3mINYkI", "RgiTYlXbQF", new byte[] { 0xb0, 0x01, 0xc3 }),
+        new Target("decoder.IsUniversalDecoder", "TianChaoXiaoJiangDecoder.TianChaoXiaoJiangCodecPlugin", "get_IsUniversalDecoder", new byte[] { 0xb0, 0x01, 0xc3 }),
         new Target("mcp.IsMethodAllowed", "Fatbeans.Vip.Mcp.McpCore", "IsMethodAllowed", new byte[] { 0xb0, 0x01, 0xc3 }),
         new Target("mcp.IsFreeMethod", "Fatbeans.Vip.Mcp.McpCore", "IsFreeMethod", new byte[] { 0xb0, 0x01, 0xc3 }),
         new Target("api.AuthorizeStart", "Fatbeans.Vip.Api.ApiCore", "AuthorizeStart", new byte[] { 0xb0, 0x01, 0xc3 }),
@@ -24,7 +25,9 @@ internal static class LocalUnlockLauncher
         new Target("webhook.Authorize", "Fatbeans.Vip.WebHook.WebHookCore", "Authorize", new byte[] { 0xb0, 0x01, 0xc3 }),
         new Target("http.AuthorizeCustomRule", "Fatbeans.Vip.HttpBreakPoint.HttpBreakPointVipCore", "AuthorizeCustomRule", new byte[] { 0xb0, 0x01, 0xc3 }),
         new Target("http.AuthorizeBatchOps", "Fatbeans.Vip.HttpBreakPoint.HttpBreakPointVipCore", "AuthorizeBatchOps", new byte[] { 0xb0, 0x01, 0xc3 }),
-        new Target("decode.AuthorizeFullOutput", "Fatbeans.Vip.Decode.DecodeVipCore", "AuthorizeFullOutput", new byte[] { 0xb0, 0x01, 0xc3 }),
+        new Target("decode.AuthorizeFullOutput", "VRD0L3fy2ViMwgPbecPj.Tekx29fyuXDI0mYmbjjn", "AuthorizeFullOutput", new byte[] { 0xb0, 0x01, 0xc3 }),
+        new Target("decode.FormatForDisplay", "VRD0L3fy2ViMwgPbecPj.Tekx29fyuXDI0mYmbjjn", "FormatForDisplay", typeof(string), new byte[] { 0x48, 0x8b, 0xc2, 0xc3 }),
+        new Target("decode.DisplayVipFallback", "Fatbeans.Controls.DecodePluginControl", "pa3lq92ZvDJ", typeof(string), new byte[] { 0x48, 0x8b, 0xc1, 0xc3 }),
         new Target("mcp.GateAllowed", null, "GateAllowed", new byte[] { 0xb0, 0x01, 0xc3 })
     };
 
@@ -147,7 +150,8 @@ internal static class LocalUnlockLauncher
                             continue;
                         foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
                         {
-                            if (!string.Equals(method.Name, target.MethodName, StringComparison.Ordinal) || method.ReturnType != typeof(bool))
+                            if (!string.Equals(method.Name, target.MethodName, StringComparison.Ordinal) ||
+                                (target.ReturnType != null && method.ReturnType != target.ReturnType))
                                 continue;
                             TryPatch(target, type, method);
                         }
@@ -283,16 +287,23 @@ internal static class LocalUnlockLauncher
     private sealed class Target
     {
         public Target(string label, string typeName, string methodName, byte[] bytes)
+            : this(label, typeName, methodName, typeof(bool), bytes)
+        {
+        }
+
+        public Target(string label, string typeName, string methodName, Type returnType, byte[] bytes)
         {
             Label = label;
             TypeName = typeName;
             MethodName = methodName;
+            ReturnType = returnType;
             Bytes = bytes;
         }
 
         public readonly string Label;
         public readonly string TypeName;
         public readonly string MethodName;
+        public readonly Type ReturnType;
         public readonly byte[] Bytes;
     }
 }
